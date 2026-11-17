@@ -121,10 +121,18 @@ Trong deleted + added có 2 ca **đổi lớp** (box đúng chỗ, sai lớp: `i
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| `img_013` (tuk-tuk hồng, có người lái) | SAM 2.1 (`sam2.1_b.pt`) | 3 (2 dương: thân `400,480`, mui `600,110`; 1 âm: lưng người lái `720,300`) | **Có**: mask dính gần hết người lái (thân, chân) và một phần người ngồi sau xe nhìn qua cạnh hở | 317 255 px (45.4% ảnh), 1 polygon. Một click âm chỉ khoét được lưng áo, không tách được đầu và chân người lái; mask còn lấn qua khoang hở sang người ở quán phía sau | `tuktuk_img013_sam2.jpg` |
+| `img_013` (cùng vật, cùng click: so sánh phiên bản) | SAM 1 (`mobile_sam.pt`) | 3 (giống dòng trên) | **Gần như không**: người lái và người phía sau nằm ngoài mask | 245 541 px (35.2% ảnh), **2 polygon**. Tách người tốt hơn SAM 2.1 nhưng hụt một mảng ở phần đầu xe / sàn trước, mask vỡ thành 2 mảnh | `tuktuk_img013_sam1.jpg` |
+| `img_004` (tuk-tuk đỏ giữa hàng xe) | SAM 2.1 (`sam2.1_b.pt`) | 3 (2 dương: thân `620,480`, đầu xe `700,560`; 1 âm: người đứng bên trái `465,450`) | Không: người đứng bên trái và xe xanh phía sau nằm ngoài mask | 93 190 px (13.3% ảnh), 1 polygon. Biên bám xe tốt; lem một dải **bóng đổ** dưới cản trước vì click `700,560` đặt sát mặt đất | `tuktuk_img004_sam2.jpg` |
+| `img_017` (tuk-tuk hồng cạnh xe xanh) | SAM 2.1 (`sam2.1_b.pt`) | 3 (2 dương: khoang khách `560,420`, thân `680,500`; 1 âm: `645,355`) | Không (khoang không có người) | 84 532 px (12.1% ảnh), 1 polygon. Mask sạch, đủ mui, thân, bánh; không dính xe xanh chạm phía sau. Click âm rơi đúng lên mui nhưng mui vẫn được giữ: click âm đặt sai chỗ, không có tác dụng | `tuktuk_img017_sam2.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
-- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
+Ghi chú: các lần chạy Part 5 chạy trên **CPU** (máy cá nhân, ultralytics 8.4.215), khác các lần r01–r06 chạy trên GPU `cuda`; Part 5 không đo thời gian nên không so tốc độ.
+
+- **Kết luận phiên bản:** giữ SAM 2.1 làm bản chính (mục 1). Trên xe không có người (`img_004`, `img_017`) SAM 2.1 cho mask liền một mảnh, bám biên tốt chỉ với 3 click. Nhưng ca khó nhất (`img_013`, người lái ngồi trong xe) cho thấy SAM 2.1 có xu hướng "nuốt" cả nhóm người + xe thành một vật; MobileSAM tách người tốt hơn nhưng mask hụt và vỡ mảnh. Không bản nào cho mask đúng contract chỉ với 3 click: cần thêm 1–2 click âm lên đầu / chân người lái hoặc thêm `--box` quanh xe.
+- **Đối chiếu guideline mục 4.2:**
+  - *Quy tắc giúp:* 4.2.3 (bóng đổ không thuộc vật) cho phép chỉ ra ngay lỗi ở `img_004`; 4.2.4 (hai vật chạm nhau không được chồng mask) cùng mục 4.1 quy tắc 4 (người trên xe là vật `person` riêng) xác định rõ mask SAM 2.1 ở `img_013` là **sai**, dù nhìn qua trông "đẹp".
+  - *Quy tắc thiếu:* (1) 4.2.4 nói "vùng chạm thuộc vật ở phía trước", nhưng người lái ngồi **bên trong** khung xe (trước ghế, sau cột mui): chưa rõ phần nào thuộc xe, phần nào thuộc người. (2) 4.2.2 chỉ nói về lỗ thủng nhỏ / lớn, chưa nói khoang khách **hở hai bên** của tuk-tuk: nhìn xuyên qua thấy người và quán phía sau thì có khoét khỏi mask không (SAM 2.1 ở `img_013` lấn vào đúng vùng này). (3) Chưa có hướng dẫn đặt click: click sát mặt đất kéo theo bóng đổ (`img_004`), click âm đặt trên chính vật thì vô tác dụng (`img_017`). Ba điểm này đưa vào calibration v1.1.
+- *(Tuỳ chọn)* Interactor SAM trong CVAT: chưa thử (ưu tiên thời gian cho Part 4 và 6); toàn bộ mask Part 5 làm offline bằng `scripts/sam2_points.py`.
 
 ## 6. Calibration (Part 6)
 
