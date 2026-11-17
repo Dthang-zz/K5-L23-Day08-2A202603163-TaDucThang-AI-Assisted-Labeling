@@ -1,1 +1,5 @@
 run_id,part,model,params,split,n_boxes,sec_per_img,what_went_right,what_went_wrong,decision
+r01,NaN,yolo26-m,--model yolo26 --size m --split pilot --conf 0...	pilot	215	1.19	NaN	NaN	NaN	work/prelabel/t_y26	cuda	8	0	umbrellax10;handbagx2;traffic lightx2;backpackx2	NaN
+r02	NaN	yolo26-m	--model yolo26 --size m --split pilot --conf 0...	pilot	139	0.34	NaN	NaN	NaN	work/prelabel/t_y26_c05	cuda	8	0	umbrellax5;handbagx2;traffic lightx1;backpackx1	NaN
+r03	NaN	yoloe-s	--model yoloe --classes three_wheeler --split ...	pilot	8	0.17	NaN	NaN	NaN	work/prelabel/t_yoloe	cuda	8	0	NaN	NaN
+r04	NaN	yolo26-m+sam(sam2.1_b.pt)	--model yolo26 --size m --classes person,motor...	custom	16	1.85	NaN	NaN	NaN	work/prelabel/t_sam	cuda	2	16	umbrellax3;handbagx1;bottlex8;chairx1	NaN
