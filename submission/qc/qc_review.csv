@@ -1,0 +1,9 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,,bo_sot,,"Xe đạp người phụ nữ đội nón (#17, x~546-588) đang dắt không có box bicycle; guideline mục 5: người dắt xe đạp -> person + bicycle"
+img_003.jpg,9,sai_lop,,three_wheeler 0.61 nằm trên xe tải thùng kín ở xa (phóng to thấy buồng lái + thùng hộp) -> truck
+img_003.jpg,11,sai_lop,,three_wheeler 0.25 nằm trên chiếc xe tải thứ hai phía sau -> truck
+img_003.jpg,12,thua,,"three_wheeler 0.16 ở mép phải (x 969-1024): chỉ có cây, xe đẩy hàng, đuôi xe máy; không có xe ba bánh"
+img_006.jpg,,khong,,"Không thấy lỗi rõ ràng; ảnh dày (30 vật), hàng xe máy đỗ và nhóm người ngồi bàn chỉ kiểm được ở mức box, không kiểm cạnh từng px"
+img_014.jpg,155,sai_lop,,motorbike cao 16 px (< 20 px): theo 4.1.6 không vẽ từng vật -> xoá hoặc gộp ignore_region
+img_031.jpg,525,thua,,"person 0.15 ở góc trên trái (0,2,30,114) là áo khoác treo bán, không có người"
+img_035.jpg,,khong,,"Xích lô #586, xe máy và người đi đường đều có box; không thấy lỗi rõ ràng"

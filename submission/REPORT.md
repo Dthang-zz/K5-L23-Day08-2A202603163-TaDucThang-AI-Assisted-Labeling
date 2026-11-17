@@ -1,4 +1,4 @@
-# Báo cáo Day 08 — <<MSHV - Họ và tên>>
+# Báo cáo Day 08 — 2A202603163 - Tạ Đức Thắng
 
 > Một file duy nhất cho cả bài (đã gộp recipe, QC và ghi chú cá nhân). Mọi con số kèm **mẫu số** và nguồn (file nào). Viết bằng lời của bạn.
 
@@ -136,26 +136,53 @@ Ghi chú: các lần chạy Part 5 chạy trên **CPU** (máy cá nhân, ultraly
 
 ## 6. Calibration (Part 6)
 
-- Số quyết định: <<>> (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): <<>>
-- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: <<>>
-- Nguyên nhân gốc: <<guideline mơ hồ / chưa nắm quy tắc / máy>>
+- **Số quyết định: 10** (`calibration_decisions.csv`): 2 `loi_may` (CAL-01, CAL-02), 7 `cau_hoi_mo` (CAL-03 → CAL-09, chốt đủ 7 câu hỏi mở của v1.0), 1 `bay_lot` (CAL-10). Không có ca `can_review` vì lúc duyệt tôi không tick box nào (bản thân việc này là một dấu hiệu duyệt vội: ở `img_003` có 2 xe tải ở xa mà lẽ ra phải tick).
+- **Quan trọng nhất:**
+  - **CAL-02** (YOLOE bắn `three_wheeler` lên xe tải ở xa, mảnh mép ảnh, box trùng): đây là lỗi lặp lớn nhất của máy (20/42 box `three_wheeler` bị xoá, REPORT mục 2) và vẫn còn sót trong release (`img_003` #9, #11, #12 ở mẫu QC). Quy tắc mới: `three_wheeler` phải thấy mui / khoang khách hoặc đếm được 3 bánh; buồng lái + thùng hộp kín = `truck`.
+  - **CAL-03** (người ngồi trong xe ba bánh): thay "thấy ≥ 20%" (không đo được bằng mắt) bằng tiêu chí đếm được "thấy đầu + vai". Chính tôi đã sót người như vậy ở gold `img_020`.
+  - **CAL-06** (không có ngưỡng `conf` tự chấp nhận): `img_001` `truck` 0.88 và `img_003` `three_wheeler` 0.61 đều sai, nên điểm cao không thay được việc nhìn.
+- **Quy tắc mới đã vào `guideline_v1.1_calibrated.md`:** tiêu chí bàn đạp + biển số cho xe đạp điện (CAL-08); ngưỡng 20 px áp cả cho xe máy đỗ gần camera, box < 20 px phải đổi `ignore_region` hoặc xoá (CAL-05); ngưỡng hàng nhô 20% áp cho cả mask (CAL-09); "đầu + vai" cho người trong xe (CAL-03); kính thuộc mask, khoang hở > 5% khoét, mask xe không chứa người (CAL-04); gộp box trùng cùng lớp IoU ≥ 0.5 (CAL-07); không có ngưỡng `conf` (CAL-06); dấu hiệu `truck` vs `three_wheeler` khi ở xa và quy tắc mảnh mép ảnh (CAL-02); ca khó tuk-tuk bị gọi `car` (CAL-01). Mỗi quy tắc có ảnh ví dụ, trừ CAL-08 (chưa gặp xe đạp điện trong các ảnh đã duyệt).
+- **Nguyên nhân gốc** (tách theo ca):
+  - **Máy** (CAL-01, CAL-02): YOLO26 không có lớp xe ba bánh nên gọi `car` / `truck`; YOLOE ở ngưỡng 0.15 bắn lên mọi xe có thùng. Guideline đã rõ, không cần sửa định nghĩa, chỉ thêm dấu hiệu nhận biết.
+  - **Guideline mơ hồ** (CAL-03 → CAL-09): 7 câu hỏi mở của v1.0 và 2 chỗ thiếu phát hiện ở Part 5 (khoang hở, người bên trong khung xe).
+  - **Tôi chưa áp quy tắc** (CAL-10, và box < 20 px như `img_014` #155): quy tắc 4.1.6 đã có từ v1.0 nhưng tôi giữ nguyên box nhỏ của máy. Đây là lỗi quy trình duyệt, sửa bằng 3 quy tắc ở mục 4, không phải bằng guideline.
 
 ## 7. QC và quyết định (Part 6)
 
-- Mẫu: <<n>> ảnh (<<m>> ảnh `can_review` + <<k>> ngẫu nhiên, seed 42); người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
-- Lỗi theo **đối tượng**: <<.../... = ...%>> · theo **ảnh**: <<.../... = ...%>> (ngưỡng Release ≤ 2%)
-- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: <<>>
-- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): <<>>
-- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): <<>>
+- **Mẫu:** 5 ảnh (`img_003`, `img_006`, `img_014`, `img_031`, `img_035`) = 0 ảnh `can_review` + 5 ngẫu nhiên, seed 42 (`qc_sample.py --n 5 --seed 42`), **115 đối tượng**, lấy từ release candidate 24 ảnh / 609 đối tượng (`build_release.py`). Người kiểm: Claude (AI) soát bằng mắt trên ảnh overlay có id và ảnh gốc phóng to, tôi xem lại phiếu (**hạn chế**: không phải người kiểm độc lập có chuyên môn; người duyệt lô là tôi).
+- **Lỗi theo đối tượng: 6/115 = 5.2%** · **theo ảnh: 3/5 = 60.0%** (ngưỡng Release ≤ 2%). Hai ảnh sạch: `img_006`, `img_035`.
+- **Top lỗi** (`qc_review.csv`):
 
-**Quyết định: <<Release / Hold / Rework>>**, ngày <<YYYY-MM-DD>>. Lý do (đi theo Hold → Rework → Release): <<>>
-Nếu Rework / Hold, việc cần làm tiếp: <<>>
+  | Loại | Số | Ví dụ |
+  |---|---|---|
+  | sai lớp | 3/6 | `img_003` #9 và #11: xe tải thùng kín ở xa bị YOLOE gán `three_wheeler` (0.61, 0.25); `img_014` #155: xe máy cao 16 px, theo 4.1.6 phải là `ignore_region` hoặc xoá |
+  | thừa | 2/6 | `img_031` #525: `person` 0.15 trên áo khoác treo bán; `img_003` #12: `three_wheeler` 0.16 ở mép phải, không có xe |
+  | bỏ sót | 1/6 | `img_003`: xe đạp người phụ nữ đội nón đang dắt (#17) không có box `bicycle` |
+  | sai vị trí / kích thước, sai thuộc tính, sai mask | 0 | (không kiểm được cạnh từng px ở ảnh dày; release không có mask) |
+
+  5/6 lỗi là box **của máy được giữ nguyên** lúc duyệt (điểm 0.15–0.61), 4/6 lỗi rơi vào lớp `three_wheeler` / ngưỡng 20 px, đúng hai điểm yếu đã thấy ở mục 2 và 3. `sai_lop` chiếm 3/6 nên `qc_report.py` đánh dấu là **lỗi hệ thống**: cần sửa quy tắc / recipe (CAL-02, CAL-05), không chỉ sửa từng ảnh.
+- **Giới hạn mẫu nhỏ:** 3/5 ảnh lỗi cho cận trên 95% (Wilson) của tỉ lệ ảnh lỗi thật là **88%**. Ngay cả khi mẫu sạch 0/5, cận trên vẫn khoảng 3/5 = 60% (quy tắc 3), nên **mẫu 5 ảnh không bao giờ chứng minh được ngưỡng 2%**. Ở đây chiều ngược lại mới là kết luận chắc chắn: 3/5 ảnh lỗi là đủ để nói lô **chưa đạt**, dù tỉ lệ thật có thể thấp hơn 60%. Mẫu cũng chỉ có 115/609 = 19% đối tượng của release.
+- **Script kiểm được / không kiểm được:** script đếm được trạng thái box, bẫy, tỉ lệ lỗi theo phiếu, box < 20 px (`validate_labels.py` báo 15 box). Script **không** biết box `three_wheeler` ở `img_003` thực ra là xe tải, không thấy xe đạp bị cả máy lẫn tôi cùng bỏ sót, không kiểm được box có ôm sát không, và không biết tôi có theo checklist thật hay không. Cả 6 lỗi QC đều chỉ thấy được bằng mắt.
+
+**Quyết định: Rework**, ngày 2026-11-17. Lý do (đi theo Hold → Rework → Release):
+1. *Hold?* Không: cả 7 câu hỏi mở đã chốt trong v1.1 (`qc_report.py` chạy với `--guideline-gap 0`), dữ liệu không có ảnh hỏng.
+2. *Rework?* Có, đúng cả ba điều kiện: ảnh lỗi **3/5 = 60% > 2%**; một loại lỗi lặp (`sai_lop` **3/6 lỗi = 50%**, ≥ 3 lỗi); bắt bẫy **2/12 = 16.7% < 80%**. Chỉ một điều kiện là đủ Rework.
+3. Không được Release: `batch_reviewed.json` hiện còn lỗi do chính quá trình duyệt (bẫy lọt 10/12, box máy sai được giữ nguyên).
+
+**Việc cần làm tiếp (vòng 2):**
+1. Sửa 6 lỗi QC trong CVAT (`img_003`: thêm `bicycle`, #9 #11 → `truck`, xoá #12; `img_014` #155 → `ignore_region` hoặc xoá; `img_031` xoá #525), export `submission/labels/qc_fixed.json`.
+2. Duyệt lại **cả 24 ảnh** theo guideline v1.1 và 3 quy tắc ở mục 4 (quét lưới trước, ≥ 2.5 phút/ảnh, lượt lọc riêng `three_wheeler` / `truck` / `bicycle` / `bus`, áp 4.1.6 cho box < 20 px), tick `can_review` khi không chắc. Ưu tiên 6 ảnh "0 thay đổi" (`img_021`, `img_026`, `img_028`, `img_029`, `img_033`, `img_034`).
+3. Vì đã biết đáp án 12 bẫy cũ, bẫy cũ **không còn đo được** thiên kiến ở vòng 2: cần bộ bẫy mới (seed khác) hoặc người kiểm độc lập.
+4. Chạy lại `build_release.py`, `qc_sample.py --n 10 --force` (mẫu lớn hơn), `qc_report.py`; ghi kết quả vòng 2 vào báo cáo này.
 
 ## 8. Ghi chú cá nhân
 
-- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
-- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
-- Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
-- Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
-- Lỗi / bug script đã gặp (nếu có): <<>>
-- Một điều bạn làm khác lần sau: <<>>
+- **Dùng AI để làm bài:** có, **Claude Code (Claude)** cho Part 5–6:
+  - sửa ô 5.2 của notebook Colab (lỗi do dòng code bị ngắt khi dán) và chạy `sam2_points.py` cho Part 5 trên CPU máy tôi;
+  - soát mẫu QC 5 ảnh (`qc_review.csv`), soạn `calibration_decisions.csv`, `guideline_v1.1_calibrated.md` và nháp `REPORT.md` mục 5–7.
+  - *Kiểm tra:* tôi mở lại ảnh trong `submission/masks/` và `work/qc/review/` để đối chiếu từng lỗi; mọi số liệu lấy từ output script (`review_stats.md`, `qc_report_auto.md`), không có số tự đặt.
+- **Gold có bị nhiễm không:** không. Gold 4 ảnh gán tay và commit (`0997a6a`, "Part 1") trước khi chạy model (`52f4ac4`, "Part 2-3"); AI chỉ được dùng từ Part 5.
+- **Máy / GPU / CVAT:** Windows 11, laptop không dùng GPU cho model; model Part 2–4 chạy trên Google Colab (GPU T4, `device = cuda` trong `runs.csv`), Part 5 chạy trên CPU máy tôi. CVAT chạy bằng Docker trên máy. Vướng mắc: phiên Colab tự ngắt sau khi làm Part 3–4 trên máy, phải chạy lại ô cấu hình, nối lại Google Drive.
+- **Dùng cache `data/cache/`?** Không: `y26_all` và `yoloe_all` (r05, r06) tự chạy trên Colab.
+- **Lỗi / bug script đã gặp:** ô 5.2 của notebook Colab báo `SyntaxError: unterminated string literal` (dòng code dài bị ngắt khi dán), đã viết lại ô với các dòng ngắn; `merge_prelabels.py` không lọc box trùng **trong cùng một file** nên box `three_wheeler` trùng của YOLOE lọt sang batch (mục 2).
+- **Một điều làm khác lần sau:** duyệt theo đúng checklist với sàn thời gian (≥ 2.5 phút/ảnh) và quét ảnh trước khi bật nhãn máy; tick `can_review` ngay khi không chắc (lần này 0 box được tick dù có ca như xe tải ở xa `img_003`); và nâng ngưỡng YOLOE lên 0.3 + lọc trùng trước khi gộp.
