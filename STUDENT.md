@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: Dthang-zz
 - Repo bài nộp (URL): https://github.com/Dthang-zz/K5-L23-Day08-2A202603163-TaDucThang-AI-Assisted-Labeling
-- Commit chốt bài (hash): Lab08
+- Commit chốt bài (hash): Lab08_update
 - Máy: Windows 11, không dùng GPU máy cho model (model chạy trên Google Colab GPU T4 CUDA; Part 5 chạy CPU)
 - CVAT (Docker): v2.82.1
 
